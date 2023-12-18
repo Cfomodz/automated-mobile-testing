@@ -1,4 +1,6 @@
 import unittest
+import time
+
 from appium import webdriver
 from appium.options.common.base import AppiumOptions
 from appium.webdriver.common.appiumby import AppiumBy
@@ -91,6 +93,59 @@ class TestMuambatorApp(unittest.TestCase):
             EC.visibility_of_element_located((By.XPATH, "//android.widget.TextView[@text=\"Nova conta\"]"))
         )
         self.assertTrue(el_botao_login_apos_logout.is_displayed(), "Não retornou para a tela inicial após o logout")
+
+    def test_05_add_new_package_success(self):
+        """Testa a inclusão de um novo pacote com sucesso."""
+        self.debug = True
+        self.debug_print("Cenário 5: Incluir Pacote com Sucesso")
+
+        # Login
+        self.app_utils.login("lfsdias", "teste123")
+
+        time.sleep(5)
+
+        # Dados do novo pacote
+        package_code = "NM027033020BR"
+        package_name = "Pacote Auto 1"
+
+        # Incluir pacote
+        self.app_utils.add_new_packet(package_code, package_name)
+
+        # Aguardar a exibição da página de publicidade
+        self.debug_print("Aguardando a exibição da página de publicidade")
+        WebDriverWait(self.driver, 25).until(
+            EC.visibility_of_element_located((AppiumBy.XPATH,
+                                              "//android.view.View[@resource-id=\"mys-content\"]/android.view.View[2]/android.widget.TextView"))
+        ).click()
+
+        # Verificar se o pacote foi adicionado corretamente
+        self.debug_print("Verificando se o pacote foi adicionado corretamente")
+        el_added_package = self.driver.find_element(by=AppiumBy.XPATH,
+                                                    value=f"//android.widget.TextView[@text=\"{package_name}\"]")
+        self.assertTrue(el_added_package.is_displayed(), "Pacote não encontrado na lista")
+
+
+    def test_06_delete_package_success(self):
+        """Testa a exclusão de um pacote com sucesso."""
+        self.debug = True
+        self.debug_print("Cenário 6: Excluir Pacote com Sucesso")
+
+        # Login
+        self.debug_print("Realizando Login")
+        self.app_utils.login("lfsdias", "teste123")
+
+        time.sleep(3)
+
+        # Excluir pacote
+        package_name_to_delete = "Pacote Auto 1"
+        self.debug_print("Excluindo o pacote")
+        self.app_utils.delete_package(package_name_to_delete)
+
+        # Verificar se o pacote foi removido corretamente
+        self.debug_print("Verificando se o pacote foi removido corretamente")
+        el_deleted_package = self.driver.find_elements(by=AppiumBy.XPATH,
+                                                       value=f"//android.widget.TextView[@text=\"{package_name_to_delete}\"]")
+        self.assertFalse(el_deleted_package, "Pacote encontrado na lista após exclusão")
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 class AppUtils:
     def __init__(self, driver):
@@ -75,3 +76,69 @@ class AppUtils:
         except TimeoutException:
             print("Timeout ao tentar fechar a mensagem de erro. Verifique se o elemento está presente na página.")
             raise
+
+    def add_new_packet(self, package_code, package_name):
+        """Inclui um novo pacote."""
+
+        # Clicar no botão "Incluir pacote"
+        el_add_package = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, "Incluir pacote"))
+        )
+        el_add_package.click()
+
+        # Preencher o código do pacote
+        el_code = self.driver.find_element(by=AppiumBy.ID, value="br.com.muambator.android:id/package_form_text_code")
+        el_code.click()
+        el_code.send_keys(package_code)
+
+        # Preencher o nome do pacote
+        el_name = self.driver.find_element(by=AppiumBy.ID, value="br.com.muambator.android:id/package_form_text_name")
+        el_name.click()
+        el_name.send_keys(package_name)
+
+        # Confirmar a inclusão
+        el_confirm = self.driver.find_element(by=AppiumBy.ACCESSIBILITY_ID, value="Confirmar")
+        el_confirm.click()
+
+        time.sleep(20)
+
+    def delete_package(self, package_name):
+        """Exclui um pacote."""
+
+        # Verificar se o pacote está na lista
+        try:
+            el_package = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((AppiumBy.XPATH,
+                                            f"//android.widget.TextView[@text='{package_name}']"))
+            )
+
+            # Se o pacote estiver visível, continue com a exclusão
+            el_package.click()
+
+            # Clicar no ícone "Mais opções"
+            el_more_options = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, "Mais opções"))
+            )
+            el_more_options.click()
+
+            # Escolher a opção "Excluir"
+            el_delete_option = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((AppiumBy.XPATH,
+                                            "//android.widget.TextView[@resource-id=\"br.com.muambator.android:id/title\" and @text=\"Excluir\"]"))
+            )
+            el_delete_option.click()
+
+            # Aguardar a tela de confirmação de exclusão
+            el_confirm_title = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((AppiumBy.ID, "br.com.muambator.android:id/alertTitle"))
+            )
+
+            # Clicar no botão "Confirmar"
+            el_confirm_button = self.driver.find_element(by=AppiumBy.ID, value="android:id/button1")
+            el_confirm_button.click()
+
+            # Aguardar alguns segundos para a exclusão ser processada
+            time.sleep(5)
+
+        except TimeoutException:
+            print(f"Pacote '{package_name}' não encontrado na lista para exclusão. Verifique se o pacote existe.")
