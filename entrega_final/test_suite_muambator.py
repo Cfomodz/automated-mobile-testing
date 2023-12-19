@@ -134,8 +134,8 @@ class TestMuambatorApp(unittest.TestCase):
         # Dados do Login e pacote
         username = "lfsdias"
         password = "teste123"
-        package_code = "NM027033020BR"
-        package_name = "Pacote Automatizado"
+        package_code = "NM027033020BB"
+        package_name = "Pacote Automatizado 1"
 
         # Realiza o Login
         self.debug_print("Realiza Login")
@@ -149,8 +149,11 @@ class TestMuambatorApp(unittest.TestCase):
         # Aguardar a exibição da página de publicidade e interagir com ela
         self.debug_print("Aguardando a exibição da página de publicidade")
         self.app_utils.interact_with_advertisement()
-
         time.sleep(5)  # Aguarda um tempo após interagir com a publicidade
+
+        # Verifica se a tela de publicidade foi finalizada corretamente
+        self.debug_print("Verificando se tela publicidade foi finalizada corretamente")
+        self.app_utils.verify_advertisement_screen_closed()
 
         # Verificar se o pacote foi adicionado corretamente
         self.debug_print("Verificando se o pacote foi adicionado corretamente")

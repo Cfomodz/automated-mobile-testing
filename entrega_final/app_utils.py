@@ -119,47 +119,65 @@ class AppUtils:
     def interact_with_advertisement(self):
         """Interage com a publicidade, se presente."""
         try:
-            # Aguardar a exibição da página de publicidade
-            el_advertisement = WebDriverWait(self.driver, 60).until(
-                EC.presence_of_element_located((By.XPATH,
-                                                "//android.view.View[@resource-id=\"mys-content\"]/android.view.View[2]/android.widget.TextView"))
-            )
+            # Verifique se o botão "Pular Vídeo" está presente
+            try:
+                el_pular_video = WebDriverWait(self.driver, 5).until(
+                    EC.element_to_be_clickable((AppiumBy.XPATH, "//android.widget.TextView[@text='Pular vídeo']"))
+                )
+                el_pular_video.click()
 
-            # Verificar se o elemento está presente antes de clicar
-            if el_advertisement.is_displayed():
-                el_advertisement.click()
+                # Botão "Pular Vídeo" encontrado, aguarde mais 5 segundos para o botão de fechar aparecer
+                time.sleep(5)
 
-                # Tentar clicar em "Pular vídeo" ou no ícone de fechar
-                possible_elements = [
-                    {"locator": (By.XPATH, "//android.widget.TextView[@text=\"Pular vídeo\"]"), "name": "Pular vídeo"},
-                    {"locator": (By.XPATH,
-                                 "//android.view.View[@resource-id=\"mys-content\"]/android.view.View[2]/android.widget.TextView"),
-                     "name": "Ícone de Fechar"}
-                ]
+                # Tente clicar no botão Fechar após esperar 5 segundos
+                try:
+                    el_fechar = WebDriverWait(self.driver, 5).until(
+                        EC.element_to_be_clickable((AppiumBy.CLASS_NAME, "android.widget.Button"))
+                    )
+                    el_fechar.click()
 
-                for element_info in possible_elements:
-                    try:
-                        element = WebDriverWait(self.driver, 10).until(
-                            EC.element_to_be_clickable(element_info["locator"])
-                        )
-                        element.click()
-                        print(f"Clicou em {element_info['name']}")
-                        break  # Se clicou em algum elemento, sair do loop
-                    except TimeoutException:
-                        print(f"Elemento {element_info['name']} não encontrado ou não é clicável.")
+                except TimeoutException:
+                    print("Botão de fechar não encontrado após 5 segundos.")
 
-        except TimeoutException:
-            # Tratar a exceção e continuar ou sinalizar uma falha, conforme necessário
-            print("Elemento de publicidade não encontrado após 60 segundos.")
+            except TimeoutException:
+                # Botão "Pular Vídeo" não encontrado, tente clicar no botão de fechar diretamente
+                try:
+                    el_fechar_direto = WebDriverWait(self.driver, 5).until(
+                        EC.element_to_be_clickable((AppiumBy.CLASS_NAME, "android.widget.Button"))
+                    )
+                    el_fechar_direto.click()
+
+                except TimeoutException:
+                    print("Botão de fechar não encontrado após 5 segundos.")
+
         except NoSuchElementException:
             # Tratar a exceção e continuar ou sinalizar uma falha, conforme necessário
             print("Elementos da publicidade não encontrados ou ações não foram necessárias")
+
+    def verify_advertisement_screen_closed(self):
+        """Verifica se a tela de publicidade foi fechada corretamente."""
+        try:
+            # Aguarde até 10 segundos para um elemento que indica que a tela de publicidade foi fechada
+            el_advertisement_closed = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((AppiumBy.CLASS_NAME, "android.widget.Button"))
+            )
+
+            # Verifique se o elemento está visível
+            if el_advertisement_closed.is_displayed():
+                self.debug_print("A tela de publicidade foi fechada corretamente.")
+                # Clique no botão "Fechar" se estiver visível
+                el_advertisement_closed.click()
+            else:
+                self.debug_print("A tela de publicidade não foi fechada corretamente.")
+        except TimeoutException:
+            # Manipule a exceção conforme necessário ou sinalize uma falha
+            self.debug_print("Timeout ao verificar o fechamento da tela de publicidade.")
 
     def delete_package(self, package_name):
         """Exclui um pacote."""
         try:
             # Verifica se o pacote está na lista antes de prosseguir
-            el_package = WebDriverWait(self.driver, 10).until(
+            el_package = WebDriverWait(self.driver, 5).until(
                 EC.element_to_be_clickable((AppiumBy.XPATH,
                                             f"//android.widget.TextView[@text='{package_name}']"))
             )
@@ -167,20 +185,20 @@ class AppUtils:
             el_package.click()
 
             # Clica no ícone "Mais opções"
-            el_more_options = WebDriverWait(self.driver, 10).until(
+            el_more_options = WebDriverWait(self.driver, 5).until(
                 EC.element_to_be_clickable((AppiumBy.ACCESSIBILITY_ID, "Mais opções"))
             )
             el_more_options.click()
 
             # Escolhe a opção "Excluir"
-            el_delete_option = WebDriverWait(self.driver, 10).until(
+            el_delete_option = WebDriverWait(self.driver, 5).until(
                 EC.element_to_be_clickable((AppiumBy.XPATH,
                                             "//android.widget.TextView[@resource-id=\"br.com.muambator.android:id/title\" and @text=\"Excluir\"]"))
             )
             el_delete_option.click()
 
             # Aguarda a tela de confirmação de exclusão
-            el_confirm_title = WebDriverWait(self.driver, 10).until(
+            el_confirm_title = WebDriverWait(self.driver, 5).until(
                 EC.visibility_of_element_located((AppiumBy.ID, "br.com.muambator.android:id/alertTitle"))
             )
 
