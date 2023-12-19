@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from app_utils import AppUtils
 
+
 class TestMuambatorApp(unittest.TestCase):
 
     def setUp(self):
@@ -51,7 +52,7 @@ class TestMuambatorApp(unittest.TestCase):
         # Realiza o Login
         self.app_utils.login(username, password)
 
-        #Navega para a tela de preferências
+        # Navega para a tela de preferências
         self.app_utils.navigate_to_preferences()
 
         # Verifica o nome do usuário na tela "Preferências"
@@ -81,6 +82,7 @@ class TestMuambatorApp(unittest.TestCase):
             EC.visibility_of_element_located((By.XPATH, "//android.widget.TextView[@text=\"Login\"]"))
         )
         self.assertTrue(el_page_login.is_displayed(), "A mensagem de erro não foi fechada corretamente")
+
     def test_03_falha_login_usuario_invalido(self):
         """Testa o login com falha devido à usuário inválido."""
         self.debug = True
@@ -134,8 +136,8 @@ class TestMuambatorApp(unittest.TestCase):
         # Dados do Login e pacote
         username = "lfsdias"
         password = "teste123"
-        package_code = "NM027033020BB"
-        package_name = "Pacote Automatizado 1"
+        package_code = "NM027033020BR"
+        package_name = "Pacote Automatizado"
 
         # Realiza o Login
         self.debug_print("Realiza Login")

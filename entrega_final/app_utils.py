@@ -1,10 +1,12 @@
-from appium.webdriver.common.appiumby import AppiumBy
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import NoSuchElementException
+import logging
 import time
+
+from appium.webdriver.common.appiumby import AppiumBy
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class AppUtils:
     def __init__(self, driver):
@@ -66,26 +68,32 @@ class AppUtils:
     def close_error_message(self):
         """Fecha a janela de mensagem de erro."""
         try:
-            print("Esperando a mensagem de erro aparecer")
+            logging.info("Esperando a mensagem de erro aparecer")
             el_error_message = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((AppiumBy.ID, "android:id/message"))
             )
 
             mensagem = el_error_message.text
-            print(f"Mensagem de erro encontrada: {mensagem}")
+            logging.info(f"Mensagem de erro encontrada: {mensagem}")
 
-            print("Clicando na mensagem de erro para fechar")
+            logging.info("Clicando na mensagem de erro para fechar")
             el_error_message.click()
 
             # Clica no botão para fechar a janela de mensagem
-            print("Esperando o botão de fechar aparecer")
+            logging.info("Esperando o botão de fechar aparecer")
             el_close_button = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((AppiumBy.ID, "android:id/button1"))
             )
-            print("Clicando no botão de fechar")
+            logging.info("Clicando no botão de fechar")
             el_close_button.click()
+
         except TimeoutException:
-            print("Timeout ao tentar fechar a mensagem de erro. Verifique se o elemento está presente na página.")
+            logging.error(
+                "Timeout ao tentar fechar a mensagem de erro. Verifique se o elemento está presente na página.")
+            raise
+        except StaleElementReferenceException:
+            logging.error(
+                "StaleElementReferenceException ao tentar fechar a mensagem de erro. O elemento não está mais presente.")
             raise
 
     def add_new_packet(self, package_code, package_name):
