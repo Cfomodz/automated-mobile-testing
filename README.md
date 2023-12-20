@@ -1,5 +1,7 @@
 # Projeto de Testes Automatizados - Muambator 🚀
 
+Avaliação do curso de Especialização em Testes Ageis (ETA) da Cesar School para a disciplina Tópicos especiais II (Testes Mobile)
+
 ## Descrição do Projeto
 Este projeto visa automatizar testes no aplicativo Muambator, utilizando Python, Appium, e Vysor.
 
@@ -10,6 +12,7 @@ Este projeto visa automatizar testes no aplicativo Muambator, utilizando Python,
 - **Appium:** Framework de automação para testes mobile.
 - **Unittest:** Framework de testes unitários em Python.
 - **ADB (Android Debug Bridge):** Ferramenta para interação com dispositivos Android.
+- **Selenium**
 
 ## Estrutura do Projeto
 O projeto segue a arquitetura de Page Object Model (POM) para uma organização mais eficiente e manutenção dos testes.
@@ -20,10 +23,17 @@ O projeto segue a seguinte estrutura:
 - **`requirements.txt`:** Lista de dependências do projeto.
 
 ## Pré-requisitos
+- Certifique-se de atender aos seguintes pré-requisitos antes de executar os testes:
+
+- Editor de codigo (Visual Studio Code) ou uma IDE (Pycharm)
+- Python 3.x instalado
+- Appium configurado
+- Android SDK instalado ou Android Studio para obter o ADB
+- Dispositivo Android conectado e Vysor ou emulador configurado
+- ADB configurado e acessível pelo terminal
+- Bibliotecas Python instaladas (verificar o arquivo requirements.txt)
 - Conta válida no Muambator para execução dos testes
 - Massa de Teste: [Códigos de Rastreio](https://linketrack.com/?utm_source=navbar)
-- Python instalado.
-- Ambiente configurado com Appium e Vysor.
 
 ## Configuração do Ambiente e Instruções para Execução
 
