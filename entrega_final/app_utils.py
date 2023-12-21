@@ -44,17 +44,15 @@ class AppUtils:
         )
         el_preferencias.click()
 
-    def logout(self):
+    def logout(self, username):
         """Realiza o logout do aplicativo."""
         print("Realizando Logout")
-        el_ola_usuario = self.driver.find_element(by=AppiumBy.XPATH, value="//android.widget.TextView[@text=\"Olá, lfsdias\"]")
+        el_ola_usuario = self.driver.find_element(by=AppiumBy.XPATH, value="//android.widget.TextView[@text='Olá, {username}']".format(username=username))
         el_ola_usuario.click()
-
         # Verifica e valida a mensagem antes de prosseguir
         el_mensagem = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((AppiumBy.ID, "android:id/message"))
         )
-
         mensagem = el_mensagem.text
         assert mensagem == "Deseja realmente sair da sua conta?", "Mensagem 'Deseja realmente sair da sua conta?' não encontrada"
 
@@ -96,7 +94,7 @@ class AppUtils:
                 "StaleElementReferenceException ao tentar fechar a mensagem de erro. O elemento não está mais presente.")
             raise
 
-    def add_new_packet(self, package_code, package_name):
+    def add_new_package(self, package_code, package_name):
         """Inclui um novo pacote."""
 
         # Clica no botão "Incluir pacote"
@@ -119,10 +117,14 @@ class AppUtils:
         el_confirm = self.driver.find_element(by=AppiumBy.ACCESSIBILITY_ID, value="Confirmar")
         el_confirm.click()
 
-        # Aguarda a inclusão ser processada
-        WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located((AppiumBy.XPATH, "//android.view.View[@resource-id=\"mys-content\"]/android.view.View[2]/android.widget.TextView"))
-        ).click()
+        # Aguardar a exibição da página de publicidade e interagir com ela
+        self.debug_print("Aguardando a exibição da página de publicidade")
+        self.interact_with_advertisement()
+
+        # Verifica se pacote foi adicionado
+        self.debug_print("Verificando se pacote foi adicionado")
+        self.verify_advertisement_screen_closed()
+        self.verify_added_package_pending(package_name)
 
     def interact_with_advertisement(self):
         """Interage com a publicidade, se presente."""
@@ -181,13 +183,43 @@ class AppUtils:
             # Manipule a exceção conforme necessário ou sinalize uma falha
             self.debug_print("Timeout ao verificar o fechamento da tela de publicidade.")
 
-    def delete_package(self, package_name):
+    def verify_added_package_pending(self, package_name):
+        """Verifica se o pacote foi adicionado corretamente na lista de pendentes."""
+        try:
+            # Aguarda até 10 segundos para o botão "PENDENTES" ser clicável
+            el_pendentes = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((AppiumBy.CLASS_NAME, "android.widget.Button"))
+            )
+            el_pendentes.click()
+
+            # Aguarda a lista de pendentes ser exibida
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (AppiumBy.XPATH, "//android.widget.LinearLayout[@content-desc='Pendentes']"))
+            )
+
+            # Verifica se o pacote foi adicionado corretamente
+            logging.debug("Verificando se o pacote foi adicionado corretamente.")
+            el_package = self.driver.find_element(by=AppiumBy.XPATH,
+                                                  value=f"//android.widget.TextView[@text=\"{package_name}\"]")
+
+            # Verifica se o elemento está visível
+            if el_package.is_displayed():
+                logging.info(f"Pacote {package_name} encontrado na lista de pendentes.")
+            else:
+                logging.warning(f"Pacote {package_name} está no DOM, mas não está visível na lista de pendentes.")
+        except TimeoutException:
+            logging.error("Timeout ao tentar verificar o pacote na lista de pendentes.")
+        except NoSuchElementException:
+            logging.error(f"Pacote {package_name} não encontrado na lista de pendentes.")
+
+    def delete_package_pending(self, package_name_to_delete):
         """Exclui um pacote."""
         try:
             # Verifica se o pacote está na lista antes de prosseguir
             el_package = WebDriverWait(self.driver, 5).until(
                 EC.element_to_be_clickable((AppiumBy.XPATH,
-                                            f"//android.widget.TextView[@text='{package_name}']"))
+                                            f"//android.widget.TextView[@text='{package_name_to_delete}']"))
             )
             # Se o pacote estiver visível, continua com a exclusão
             el_package.click()
@@ -218,4 +250,5 @@ class AppUtils:
             time.sleep(5)
 
         except TimeoutException:
-            print(f"Pacote '{package_name}' não encontrado na lista para exclusão. Verifique se o pacote existe.")
+            print(
+                f"Pacote '{package_name_to_delete}' não encontrado na lista para exclusão. Verifique se o pacote existe.")

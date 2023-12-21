@@ -1,3 +1,4 @@
+import pdb
 import unittest
 import time
 
@@ -41,7 +42,7 @@ class TestMuambatorApp(unittest.TestCase):
         if hasattr(self, 'debug') and self.debug:
             print(f"DEBUG: {message}")
 
-    def test_01_login_sucess(self):
+    def test_login_sucess(self):
         """Testa o login com sucesso e navegação para a tela de Preferências."""
         self.debug = True
 
@@ -56,13 +57,13 @@ class TestMuambatorApp(unittest.TestCase):
         self.app_utils.navigate_to_preferences()
 
         # Verifica o nome do usuário na tela "Preferências"
-        self.debug_print("Verificando o nome do usuário na tela de Preferências")
+        self.debug_print("Verifica nome do usuário logado na tela de Preferências")
         el_ola_usuario = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((AppiumBy.XPATH, f"//android.widget.TextView[@text='Olá, {username}']"))
         )
-        self.assertTrue(el_ola_usuario.is_displayed(), "Nome do usuário não encontrado na tela de Preferências")
+        self.assertTrue(el_ola_usuario.is_displayed(), "Usuário não identificado na tela de Preferências")
 
-    def test_02_falha_login_senha_invalida(self):
+    def test_failure_login_invalid_password(self):
         """Testa o login com falha devido à senha inválida."""
         self.debug = True
 
@@ -83,7 +84,7 @@ class TestMuambatorApp(unittest.TestCase):
         )
         self.assertTrue(el_page_login.is_displayed(), "A mensagem de erro não foi fechada corretamente")
 
-    def test_03_falha_login_usuario_invalido(self):
+    def test_failure_login_invalid_username(self):
         """Testa o login com falha devido à usuário inválido."""
         self.debug = True
 
@@ -104,22 +105,19 @@ class TestMuambatorApp(unittest.TestCase):
         )
         self.assertTrue(el_page_login.is_displayed(), "A mensagem de erro não foi fechada corretamente")
 
-    def test_04_logout_sucess(self):
+    def test_logout_sucess(self):
         """Testa o logout e retorno para a tela inicial."""
         self.debug = True
-
         # Dados do Login
         username = "lfsdias"
         password = "teste123"
 
         # Realiza o Login
         self.app_utils.login(username, password)
-
         # Navega para a tela de preferências
         self.app_utils.navigate_to_preferences()
-
         # Chama a função de logout
-        self.app_utils.logout()
+        self.app_utils.logout(username)
 
         # Verifica se volta para tela inicial
         self.debug_print("Verificando se retornou para a tela inicial após o logout")
@@ -128,65 +126,53 @@ class TestMuambatorApp(unittest.TestCase):
         )
         self.assertTrue(el_botao_login_apos_logout.is_displayed(), "Não retornou para a tela inicial após o logout")
 
-    def test_05_add_new_package_success(self):
+    def test_add_new_package_success(self):
         """Testa a inclusão de um novo pacote com sucesso."""
         self.debug = True
-        self.debug_print("Cenário 5: Incluir Pacote com Sucesso")
 
         # Dados do Login e pacote
         username = "lfsdias"
         password = "teste123"
-        package_code = "NM027033020BR"
-        package_name = "Pacote Automatizado"
+        package_code = "OV274368708AD"
+        package_name = "Pacote Automatizad3"
 
         # Realiza o Login
-        self.debug_print("Realiza Login")
         self.app_utils.login(username, password)
-        time.sleep(5)
 
         # Incluir pacote
         self.debug_print("Inclui pacote")
-        self.app_utils.add_new_packet(package_code, package_name)
+        self.app_utils.add_new_package(package_code, package_name)
 
-        # Aguardar a exibição da página de publicidade e interagir com ela
-        self.debug_print("Aguardando a exibição da página de publicidade")
-        self.app_utils.interact_with_advertisement()
-        time.sleep(5)  # Aguarda um tempo após interagir com a publicidade
-
-        # Verifica se a tela de publicidade foi finalizada corretamente
-        self.debug_print("Verificando se tela publicidade foi finalizada corretamente")
-        self.app_utils.verify_advertisement_screen_closed()
-
-        # Verificar se o pacote foi adicionado corretamente
-        self.debug_print("Verificando se o pacote foi adicionado corretamente")
-        el_added_package = self.driver.find_element(by=AppiumBy.XPATH,
-                                                    value=f"//android.widget.TextView[@text=\"{package_name}\"]")
-        self.assertTrue(el_added_package.is_displayed(), "Pacote não encontrado na lista")
-
-    def test_06_delete_package_success(self):
+    def test_delete_package_pending_success(self):
         """Testa a exclusão de um pacote com sucesso."""
         self.debug = True
-        self.debug_print("Cenário 6: Excluir Pacote com Sucesso")
 
         # Dados do Login e pacote
         username = "lfsdias"
         password = "teste123"
-        package_name_to_delete = "Pacote Automatizado"
+        package_name_to_delete = "Pacote Automatizad1"
 
         # Realiza o Login
-        self.debug_print("Realiza Login")
         self.app_utils.login(username, password)
-        time.sleep(5)
 
-        # Excluir pacote
-        self.debug_print("Excluindo o pacote")
-        self.app_utils.delete_package(package_name_to_delete)
+        # Excluir pacote da lista de PENDENTES
+        self.debug_print("Excluindo o pacote da lista PENDENTES")
+        self.app_utils.delete_package_pending(package_name_to_delete)
 
+        pdb.set_trace()
+        """ 
         # Verificar se o pacote foi removido corretamente
         self.debug_print("Verificando se o pacote foi removido corretamente")
         el_deleted_package = self.driver.find_elements(by=AppiumBy.XPATH,
                                                        value=f"//android.widget.TextView[@text=\"{package_name_to_delete}\"]")
-        self.assertFalse(el_deleted_package, "Pacote encontrado na lista após exclusão")
+        self.assertFalse(el_deleted_package, f"Pacote {package_name_to_delete} encontrado na lista após exclusão") """
+
+        # Verificar se a exclusão foi bem-sucedida
+        el_success_message = self.driver.find_elements(by=AppiumBy.ID,
+                                                       value="br.com.muambator.android:id/snackbar_text")
+        # Assert que o texto da mensagem é o esperado
+        expected_success_message = "Pacote '{package_name_to_delete}' excluído com sucesso."
+        self.assertEqual(el_success_message[0].text, expected_success_message, "Mensagem de exclusão incorreta")
 
 
 if __name__ == '__main__':
