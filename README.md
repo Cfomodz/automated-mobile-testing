@@ -2,7 +2,7 @@
 
 - Avaliação do curso de Especialização em Testes Ageis (ETA) da Cesar School para a disciplina Tópicos especiais II (Testes Mobile). 
 - Professor Samuel Elias Bravo Lopez 
-- Aluno: Leonardo Felipe da Silva Dias
+
 
 ## Descrição do Projeto
 Este projeto visa automatizar testes no aplicativo Muambator, utilizando Python, Appium, e Vysor.
