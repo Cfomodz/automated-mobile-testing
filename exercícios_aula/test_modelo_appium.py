@@ -41,12 +41,12 @@ time.sleep(2)
 
 el8 = driver.find_element(by=AppiumBy.ID, value="br.com.muambator.android:id/login_username")
 el8.click()
-el8.send_keys("leonardoodias")
+el8.send_keys("lfdias")
 time.sleep(2)
 
 el9 = driver.find_element(by=AppiumBy.ID, value="br.com.muambator.android:id/login_password")
 el9.click()
-el9.send_keys("Ldias@2024")
+el9.send_keys("teste123")
 time.sleep(2)
 
 el10 = driver.find_element(by=AppiumBy.ID, value="br.com.muambator.android:id/form")
